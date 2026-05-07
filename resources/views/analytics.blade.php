@@ -17,6 +17,18 @@
             --accent-dim: rgba(74, 158, 255, 0.15);
         }
 
+        /* Light mode styles for analytics page */
+        [data-theme="light"] {
+            --col-bg: #caf0f8;
+            --col-surface: #f0f9ff;
+            --col-border: #e0e7ff;
+            --col-muted: #64748b;
+            --col-text: #03045e;
+            --col-subtle: #475569;
+            --accent: hsl(220, 90%, 45%);
+            --accent-dim: hsla(220, 90%, 45%, 0.15);
+        }
+
         body {
             font-family: 'Inter', sans-serif;
             color: var(--col-text);
@@ -195,34 +207,6 @@
             transform: rotate(-90deg);
             transform-origin: 50% 50%;
         }
-
-        .recommendations {
-            background: var(--col-surface);
-            border: 1px solid var(--col-border);
-            border-radius: 12px;
-            padding: 1.5rem;
-            margin-top: 2.5rem;
-        }
-
-        .recommendation-item {
-            padding: 1rem;
-            border-left: 3px solid var(--accent);
-            background: var(--accent-dim);
-            border-radius: 6px;
-            margin-bottom: 1rem;
-        }
-
-        .recommendation-title {
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-            color: var(--accent);
-        }
-
-        .recommendation-text {
-            font-size: 0.875rem;
-            color: var(--col-subtle);
-            line-height: 1.5;
-        }
     </style>
 
     <div class="analytics-container" x-data="analyticsApp()" x-init="init()">
@@ -363,17 +347,6 @@
             </div>
         </div>
 
-        <!-- Smart Recommendations -->
-        <div class="recommendations">
-            <h3 class="chart-title" style="margin-bottom: 1rem;">Smart Recommendations</h3>
-            
-            <template x-for="rec in recommendations" :key="rec.id">
-                <div class="recommendation-item">
-                    <div class="recommendation-title" x-text="rec.title"></div>
-                    <div class="recommendation-text" x-text="rec.text"></div>
-                </div>
-            </template>
-        </div>
     </div>
 
     <script>
@@ -393,7 +366,6 @@
             heatmapData: [],
             subjectData: [],
             bestStudyTimes: [],
-            recommendations: [],
             selectedDate: null,
             selectedMonth: new Date().getMonth(),
             selectedYear: new Date().getFullYear(),
@@ -405,7 +377,6 @@
                 this.availableYears = [currentYear, currentYear - 1, currentYear - 2];
                 
                 await this.loadAnalytics();
-                this.generateRecommendations();
                 this.generateHeatmapData();
             },
 
@@ -468,31 +439,6 @@
                     { hour: 14, label: '2:00 PM', sessions: 8 },
                     { hour: 19, label: '7:00 PM', sessions: 15 },
                     { hour: 21, label: '9:00 PM', sessions: 10 }
-                ];
-            },
-
-            generateRecommendations() {
-                this.recommendations = [
-                    {
-                        id: 1,
-                        title: '🔥 Keep the Streak Going!',
-                        text: 'You have a 7-day streak! Try to maintain consistency by studying at least 25 minutes tomorrow.'
-                    },
-                    {
-                        id: 2,
-                        title: '⏰ Optimize Your Schedule',
-                        text: 'Your most productive time is 7:00 PM. Schedule important study sessions during this time.'
-                    },
-                    {
-                        id: 3,
-                        title: '📚 Focus on #math',
-                        text: 'You have the most sessions in math. Consider spending more time on other subjects for balance.'
-                    },
-                    {
-                        id: 4,
-                        title: '🎯 Try Pomodoro Technique',
-                        text: 'Your average session is 31 minutes. Try using Pomodoro (25 min) for better focus and regular breaks.'
-                    }
                 ];
             },
 

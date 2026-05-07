@@ -1,5 +1,78 @@
 <x-app-layout>
-    <div class="py-8 min-h-screen" style="background:#0d0f14;">
+    <style>
+        /* Light mode styles for history page */
+        [data-theme="light"] {
+            background: #caf0f8 !important;
+            color: #03045e !important;
+        }
+        
+        [data-theme="light"] .min-h-screen {
+            background: #caf0f8 !important;
+        }
+        
+        [data-theme="light"] .rounded-xl {
+            background: #ffffff !important;
+            border-color: #e0e7ff !important;
+            color: #03045e !important;
+        }
+        
+        [data-theme="light"] .text-xs {
+            color: #475569 !important;
+        }
+        
+        [data-theme="light"] .text-xl {
+            color: #03045e !important;
+        }
+        
+        [data-theme="light"] .font-bold {
+            color: #03045e !important;
+        }
+        
+        [data-theme="light"] .font-semibold {
+            color: #03045e !important;
+        }
+        
+        [data-theme="light"] .rounded-2xl {
+            background: #ffffff !important;
+            border-color: #e0e7ff !important;
+        }
+        
+        [data-theme="light"] table {
+            background: #ffffff !important;
+            color: #03045e !important;
+        }
+        
+        [data-theme="light"] thead {
+            background: #f0f9ff !important;
+            color: #03045e !important;
+        }
+        
+        [data-theme="light"] th {
+            color: #03045e !important;
+        }
+        
+        [data-theme="light"] td {
+            color: #03045e !important;
+            border-color: #e0e7ff !important;
+        }
+        
+        [data-theme="light"] tbody tr {
+            border-color: #e0e7ff !important;
+        }
+        
+        [data-theme="light"] .border-t {
+            border-color: #e0e7ff !important;
+        }
+        
+        [data-theme="light"] .border-b {
+            border-color: #e0e7ff !important;
+        }
+        
+        [data-theme="light"] .overflow-x-auto {
+            background: #ffffff !important;
+        }
+    </style>
+    <div class="py-8 min-h-screen" style="background:#0d0f14;" :style="document.documentElement.getAttribute('data-theme') === 'light' ? 'background:#caf0f8' : 'background:#0d0f14'">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
             <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
                 <div class="rounded-xl border p-4" style="border-color:#1e2330;background:#151820;">

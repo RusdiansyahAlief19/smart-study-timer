@@ -162,6 +162,8 @@ class TimerController extends Controller
             'longest_streak'    => $user->longest_streak,
             'total_sessions'    => $user->total_sessions,
             'streak_progress'   => $this->getStreakProgress($user),
+            'xp_points'         => $currentXP,
+            'level'             => $newLevel,
             'message'           => $this->getMotivationalMessage($newStreak),
         ]);
     }
@@ -180,6 +182,8 @@ class TimerController extends Controller
                 'longest_streak' => 0,
                 'total_sessions' => 0,
                 'streak_progress' => [],
+                'xp_points' => 0,
+                'level' => 1,
                 'requires_auth' => true,
             ]);
         }
@@ -191,6 +195,8 @@ class TimerController extends Controller
             'longest_streak'    => (int) $user->longest_streak,
             'total_sessions'    => (int) $user->total_sessions,
             'streak_progress'   => $this->getStreakProgress($user),
+            'xp_points'         => (int) $user->xp_points,
+            'level'             => (int) $user->level,
         ]);
     }
 
@@ -616,6 +622,14 @@ class TimerController extends Controller
         return response()->json([
             'recommendations' => $recommendations
         ]);
+    }
+
+    /**
+     * Tampilkan halaman credits tim.
+     */
+    public function credits()
+    {
+        return view('credits');
     }
 
     /**

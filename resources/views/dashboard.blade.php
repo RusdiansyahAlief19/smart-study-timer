@@ -11,6 +11,7 @@
 
     <style>
         :root {
+            /* Night mode (default) */
             --col-bg:        #0d0f14;
             --col-surface:   #151820;
             --col-border:    #1e2330;
@@ -30,6 +31,85 @@
             --hero-grad-b: #0a0f1d;
         }
 
+        /* Light mode variables */
+        [data-theme="light"] {
+            --col-bg:        #caf0f8;
+            --col-surface:   #f0f9ff;
+            --col-border:    #e0e7ff;
+            --col-muted:     #64748b;
+            --col-text:      #03045e;
+            --col-subtle:    #475569;
+            --hero-grad-a: #caf0f8;
+            --hero-grad-b: #ffffff;
+            
+            /* Dark blue accent colors for light mode */
+            --accent-h: 220;
+            --accent-s: 90%;
+            --accent-l: 45%;
+            --accent: hsl(var(--accent-h), var(--accent-s), var(--accent-l));
+            --accent-dim: hsla(var(--accent-h), var(--accent-s), var(--accent-l), .15);
+            --accent-ring: hsla(var(--accent-h), var(--accent-s), var(--accent-l), .30);
+            --hero-glow: hsla(var(--accent-h), var(--accent-s), var(--accent-l), .38);
+        }
+
+        /* Dark/Light mode toggle switch */
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            background: var(--col-surface);
+            border: 1px solid var(--col-border);
+            border-radius: 50px;
+            padding: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+        }
+
+        .theme-toggle-slider {
+            width: 48px;
+            height: 24px;
+            background: var(--col-muted);
+            border-radius: 24px;
+            position: relative;
+            transition: background 0.3s ease;
+        }
+
+        .theme-toggle-slider::before {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: transform 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        [data-theme="light"] .theme-toggle-slider {
+            background: #3b82f6;
+        }
+
+        [data-theme="light"] .theme-toggle-slider::before {
+            transform: translateX(24px);
+        }
+
+        .theme-toggle-icon {
+            font-size: 14px;
+            color: var(--col-text);
+        }
+
         /* ── method-specific accents ───────────────────────────── */
         [data-method="pomodoro"]{ --accent-h: 4;   --accent-s: 80%; --accent-l: 60%; }
         [data-method="5217"]    { --accent-h: 214; --accent-s: 80%; --accent-l: 60%; }
@@ -45,6 +125,15 @@
                 linear-gradient(165deg, var(--hero-grad-a), var(--hero-grad-b) 48%, #090c16);
             font-family: 'Inter', sans-serif;
             color: var(--col-text);
+            transition: background 0.3s ease;
+        }
+
+        [data-theme="light"] body,
+        body[data-theme="light"] {
+            background:
+                radial-gradient(900px 450px at 12% -10%, rgba(3, 4, 94, .08), transparent 58%),
+                radial-gradient(780px 420px at 100% 2%, rgba(71, 85, 105, .06), transparent 62%),
+                linear-gradient(165deg, var(--hero-grad-a), var(--hero-grad-b) 48%, #caf0f8) !important;
         }
         .timer-font { font-family: 'Inter', sans-serif; }
         .hero-title {
@@ -53,6 +142,141 @@
             text-transform: uppercase;
             color: #f5f8ff;
             text-shadow: 0 10px 32px rgba(10, 15, 30, .65);
+        }
+
+        [data-theme="light"] .hero-title {
+            color: #1e293b;
+            text-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Additional light mode fixes for dashboard components */
+        [data-theme="light"] .method-card {
+            background: #ffffff;
+            border-color: #e0e7ff;
+            color: #03045e;
+        }
+
+        [data-theme="light"] .method-card h4 {
+            color: #03045e !important;
+        }
+
+        [data-theme="light"] .method-card p {
+            color: #475569 !important;
+        }
+
+        [data-theme="light"] .method-card .badge {
+            background: hsla(220, 90%, 45%, 0.15) !important;
+            color: #03045e !important;
+        }
+
+        [data-theme="light"] .method-card.active {
+            border-color: #03045e !important;
+            box-shadow: 0 0 0 3px hsla(220, 90%, 45%, 0.3), 0 8px 32px -8px hsla(220, 90%, 45%, 0.15) !important;
+        }
+
+        [data-theme="light"] .timer-panel {
+            background: rgba(255, 255, 255, 0.95);
+            border-color: #e0e7ff;
+            color: #03045e;
+        }
+
+        [data-theme="light"] .timer-value {
+            color: #03045e !important;
+        }
+
+        [data-theme="light"] .phase-pill {
+            color: #03045e !important;
+        }
+
+        [data-theme="light"] .phase-pill.focus {
+            background: hsla(220, 90%, 45%, 0.15) !important;
+            color: #03045e !important;
+        }
+
+        [data-theme="light"] .phase-pill.break {
+            background: hsla(155, 65%, 45%, 0.15) !important;
+            color: #34d399 !important;
+        }
+
+        [data-theme="light"] .phase-pill.idle {
+            background: #f0f9ff !important;
+            color: #03045e !important;
+        }
+
+        [data-theme="light"] .side-panel {
+            background: #ffffff;
+            border-color: #e0e7ff;
+            color: #03045e;
+        }
+
+        [data-theme="light"] .side-panel h4 {
+            color: #03045e !important;
+        }
+
+        [data-theme="light"] .task-input {
+            background: #ffffff;
+            border-color: #e0e7ff;
+            color: #03045e;
+        }
+
+        [data-theme="light"] .task-input:focus {
+            border-color: #03045e !important;
+        }
+
+        [data-theme="light"] .task-input::placeholder {
+            color: #64748b;
+        }
+
+        [data-theme="light"] .music-btn {
+            border-color: #e0e7ff;
+            color: #03045e;
+        }
+
+        [data-theme="light"] .music-btn:hover {
+            border-color: #03045e !important;
+            color: #03045e !important;
+        }
+
+        [data-theme="light"] .music-btn.active {
+            border-color: #03045e !important;
+            background: hsla(220, 90%, 45%, 0.15) !important;
+            color: #03045e !important;
+        }
+
+        /* Additional light mode text fixes */
+        [data-theme="light"] .hero-subtitle {
+            color: #6b7280 !important;
+        }
+
+        [data-theme="light"] .text-xs {
+            color: #000000 !important;
+        }
+
+        [data-theme="light"] .font-semibold {
+            color: #000000 !important;
+        }
+
+        /* Timer ring and buttons in light mode */
+        [data-theme="light"] .ring-fill {
+            stroke: #03045e !important;
+        }
+
+        [data-theme="light"] .btn-play {
+            background: #03045e !important;
+            box-shadow: 0 10px 30px hsla(220, 90%, 45%, 0.3) !important;
+        }
+
+        [data-theme="light"] .btn-play:hover {
+            filter: brightness(1.15) !important;
+        }
+
+        [data-theme="light"] .btn-pause {
+            background: #475569 !important;
+            box-shadow: 0 10px 30px hsla(220, 90%, 45%, 0.3) !important;
+        }
+
+        [data-theme="light"] .duration-input:focus {
+            border-color: #03045e !important;
         }
         .hero-subtitle {
             letter-spacing: .2em;
@@ -208,6 +432,7 @@
             background: var(--col-surface);
             border: 1px solid var(--col-border);
             border-radius: 20px; padding: 28px;
+            position: static;
         }
         .music-btn {
             border-radius: 12px; padding: 11px 8px;
@@ -459,16 +684,16 @@
                 <div class="method-card" :class="{ active: method === 'pomodoro' }" @click="selectMethod('pomodoro')">
                     <div class="flex justify-between items-start mb-2">
                         <h4>Pomodoro</h4>
-                        <span class="badge">25 min</span>
+                        <span class="badge" x-text="customDurations.pomodoro.f + ' min'">25 min</span>
                     </div>
-                    <p class="text-xs leading-relaxed" style="color:var(--col-subtle)">Fokus 25 menit, istirahat 5 menit. Metode klasik terpopuler.</p>
+                    <p class="text-xs leading-relaxed" style="color:var(--col-subtle)">Fokus <span x-text="customDurations.pomodoro.f">25</span> menit, istirahat <span x-text="customDurations.pomodoro.b">5</span> menit. Metode klasik terpopuler.</p>
                 </div>
                 <div class="method-card" :class="{ active: method === '5217' }" @click="selectMethod('5217')">
                     <div class="flex justify-between items-start mb-2">
                         <h4>52/17</h4>
-                        <span class="badge">52 min</span>
+                        <span class="badge" x-text="customDurations['5217'].f + ' min'">52 min</span>
                     </div>
-                    <p class="text-xs leading-relaxed" style="color:var(--col-subtle)">Fokus 52 menit, istirahat 17 menit. Ritme riset DeskTime.</p>
+                    <p class="text-xs leading-relaxed" style="color:var(--col-subtle)">Fokus <span x-text="customDurations['5217'].f">52</span> menit, istirahat <span x-text="customDurations['5217'].b">17</span> menit. Ritme riset DeskTime.</p>
                 </div>
                 <div class="method-card" :class="{ active: method === 'flowtime' }" @click="selectMethod('flowtime')">
                     <div class="flex justify-between items-start mb-2">
@@ -546,11 +771,11 @@
                     <div class="flex justify-center gap-4 mb-4">
                         <div class="flex items-center gap-2 px-3 py-1.5 rounded-lg border" style="border-color:#4a4125;color:#f0d792;">
                             <span>⚡</span>
-                            <span class="font-semibold">{{ Auth::user()->xp_points ?? 0 }} XP</span>
+                            <span class="font-semibold" x-text="xpPoints + ' XP'"></span>
                         </div>
                         <div class="flex items-center gap-2 px-3 py-1.5 rounded-lg border" style="border-color:#7c3aed;color:#a78bfa;">
                             <span>🎯</span>
-                            <span class="font-semibold">Level {{ Auth::user()->level ?? 1 }}</span>
+                            <span class="font-semibold" x-text="level"></span>
                         </div>
                     </div>
                 @endauth
@@ -567,14 +792,10 @@
                         <span class="timer-font timer-value font-extrabold tracking-tighter" x-text="formatTime(displayTime)"></span>
                         <span class="text-xs mt-2 uppercase tracking-widest" style="color:var(--col-subtle)" x-text="phaseLabel"></span>
                         {{-- Task label di dalam ring ──────────────────────────── --}}
-                        <span
-                            class="task-ring-label"
-                            x-show="task.trim() && phase !== 'idle'"
-                            x-text="task"
-                            x-transition:enter="transition ease-out duration-300"
-                            x-transition:enter-start="opacity-0 translate-y-1"
-                            x-transition:enter-end="opacity-100 translate-y-0"
-                        ></span>
+                        <span class="task-ring-label" x-show="task.trim() && phase !== 'idle'" x-text="task"
+                              x-transition:enter="transition ease-out duration-300"
+                              x-transition:enter-start="opacity-0 translate-y-1"
+                              x-transition:enter-end="opacity-100 translate-y-0"></span>
                     </div>
                 </div>
 
@@ -610,8 +831,8 @@
                     </button>
                 </div>
                 <div class="mt-4">
-                    <button @click="exportDailyRecap()" class="text-xs px-4 py-2 rounded-lg border" style="border-color:var(--col-border);color:var(--col-text);">
-                        Copy recap harian
+                    <button @click="console.log('Button clicked! showRecapModal before:', showRecapModal); showRecapModal = true; console.log('showRecapModal after:', showRecapModal);" class="text-xs px-4 py-2 rounded-lg border" style="border-color:var(--col-border);color:var(--col-text);">
+                        Lihat Recap Harian
                     </button>
                     <button @click="openTimerPopup()" class="text-xs px-4 py-2 rounded-lg border ml-2" style="border-color:var(--col-border);color:var(--col-text);">
                         Open popup timer
@@ -719,70 +940,116 @@
                             </button>
                         </div>
                     </div>
+                    </div>
                 </div>
 
-            </div>
-        </div>
-    </div>
+                {{-- ══════════════ RECAP MODAL ══════════════ --}}
+                <div class="completion-modal-bg" :class="{ open: showRecapModal }" @click.self="showRecapModal = false">
+                    <div class="completion-modal" style="text-align:center; max-width: 400px;">
+                        <div style="font-size:3rem;margin-bottom:10px">📊</div>
+                        <h3 class="font-bold text-xl mb-4 text-white">Recap Belajar Hari Ini</h3>
+                        
+                        <div class="grid grid-cols-2 gap-4 mb-6">
+                            <div class="p-4 rounded-xl" style="background:var(--col-bg); border:1px solid var(--col-border);">
+                                <div class="text-xs mb-1" style="color:var(--col-subtle)">Waktu Fokus</div>
+                                <div class="text-lg font-bold text-blue-400" x-text="formatTime(totalFocusToday)"></div>
+                            </div>
+                            <div class="p-4 rounded-xl" style="background:var(--col-bg); border:1px solid var(--col-border);">
+                                <div class="text-xs mb-1" style="color:var(--col-subtle)">Total Sesi</div>
+                                <div class="text-lg font-bold text-green-400" x-text="sessionsToday + ' Sesi'"></div>
+                            </div>
+                            <div class="p-4 rounded-xl" style="background:var(--col-bg); border:1px solid var(--col-border);">
+                                <div class="text-xs mb-1" style="color:var(--col-subtle)">XP Didapat</div>
+                                <div class="text-lg font-bold text-yellow-400" x-text="xpPoints + ' XP'"></div>
+                            </div>
+                            <div class="p-4 rounded-xl" style="background:var(--col-bg); border:1px solid var(--col-border);">
+                                <div class="text-xs mb-1" style="color:var(--col-subtle)">Current Streak</div>
+                                <div class="text-lg font-bold text-orange-400" x-text="streak + ' Hari 🔥'"></div>
+                            </div>
+                        </div>
 
-    {{-- ══════════════ COMPLETION MODAL ══════════════ --}}
-    <div class="completion-modal-bg" :class="{ open: showModal }" @click.self="showModal = false">
-        <div class="completion-modal">
-            <div style="font-size:2.5rem;margin-bottom:6px">🎯</div>
-            <h3 class="font-bold text-lg mb-1">Sesi Fokus Selesai!</h3>
-            <p class="text-xs mb-2" style="color:var(--col-subtle)" x-text="'Durasi: ' + formatTime(lastSessionDuration)"></p>
+                        <div class="p-3 rounded-lg text-sm mb-6" style="background:var(--col-bg); border:1px solid var(--col-border); text-align:left;">
+                            <span style="color:var(--col-subtle)">Fokus terakhir:</span>
+                            <span class="ml-2 text-white font-medium" x-text="task.trim() || 'Tidak ada catatan'"></span>
+                        </div>
 
-            <div x-show="task.trim()">
-                <p class="text-xs" style="color:var(--col-subtle)">Apakah kamu berhasil menyelesaikan:</p>
-                <div class="modal-task-name" x-text="task"></div>
-                
-                <!-- Enhanced Session Notes -->
-                <div class="session-notes-editor">
-                    <div class="notes-toolbar">
-                        <button @click="formatNote('bold')" class="notes-btn" title="Bold">B</button>
-                        <button @click="formatNote('italic')" class="notes-btn" title="Italic" style="font-style: italic;">I</button>
-                        <button @click="formatNote('underline')" class="notes-btn" title="Underline" style="text-decoration: underline;">U</button>
-                        <button @click="insertNoteTag()" class="notes-btn" title="Add Tag">#</button>
-                        <button @click="clearNotes()" class="notes-btn" title="Clear">Clear</button>
-                    </div>
-                    <div 
-                        class="notes-content" 
-                        contenteditable="true"
-                        x-ref="notesEditor"
-                        x-html="sessionNote"
-                        @input="updateSessionNote()"
-                        @keydown="handleNotesKeydown($event)"
-                        @paste="handleNotesPaste($event)"
-                        data-placeholder="Catatan sesi: aku ngerjain apa tadi? #subject #difficulty"
-                    ></div>
-                    <div class="notes-footer">
-                        <span class="notes-counter">
-                            <span x-text="getNotesLength()"></span>/300
-                        </span>
-                        <div class="notes-tags" x-show="getNotesTags().length > 0">
-                            <template x-for="tag in getNotesTags()" :key="tag">
-                                <span class="note-tag" x-text="tag"></span>
-                            </template>
+                        <div class="flex gap-3 justify-center">
+                            <button @click="exportDailyRecap()" class="text-xs px-6 py-2 rounded-xl font-bold transition-all" style="background:var(--col-bg); color:var(--col-text); border:1px solid var(--col-border);">
+                                <span x-text="copyTextState"></span>
+                            </button>
+                            <button @click="showRecapModal = false" class="text-xs px-6 py-2 rounded-xl font-bold transition-all" style="background:var(--accent); color:white;">
+                                Tutup
+                            </button>
                         </div>
                     </div>
                 </div>
-                <div class="flex gap-3">
-                    <button class="modal-btn modal-btn-yes" @click="markTaskDone(true)">✓ Berhasil!</button>
-                    <button class="modal-btn modal-btn-no"  @click="markTaskDone(false)">✗ Belum</button>
+
+                {{-- ══════════════ COMPLETION MODAL ══════════════ --}}
+                <div class="completion-modal-bg" :class="{ open: showModal }" @click.self="showModal = false">
+                    <div class="completion-modal">
+                        <div style="font-size:2.5rem;margin-bottom:6px">🎯</div>
+                        <h3 class="font-bold text-lg mb-1">Sesi Fokus Selesai!</h3>
+                        <p class="text-xs mb-2" style="color:var(--col-subtle)">
+                            <span x-text="'Durasi: ' + formatTime(lastSessionDuration)"></span>
+                            <span x-show="pendingBreakSec > 0" x-text="' • Istirahat: ' + Math.round(pendingBreakSec / 60) + ' mnt'"></span>
+                        </p>
+
+                        <div x-show="task.trim()">
+                            <p class="text-xs" style="color:var(--col-subtle)">Apakah kamu berhasil menyelesaikan:</p>
+                            <div class="modal-task-name" x-text="task"></div>
+                            
+                            <!-- Enhanced Session Notes -->
+                            <div class="session-notes-editor">
+                                <div class="notes-toolbar">
+                                    <button @click="formatNote('bold')" class="notes-btn" title="Bold">B</button>
+                                    <button @click="formatNote('italic')" class="notes-btn" title="Italic" style="font-style: italic;">I</button>
+                                    <button @click="formatNote('underline')" class="notes-btn" title="Underline" style="text-decoration: underline;">U</button>
+                                    <button @click="insertNoteTag()" class="notes-btn" title="Add Tag">#</button>
+                                    <button @click="clearNotes()" class="notes-btn" title="Clear">Clear</button>
+                                </div>
+                                <div 
+                                    class="notes-content" 
+                                    contenteditable="true"
+                                    x-ref="notesEditor"
+                                    x-html="sessionNote"
+                                    @input="updateSessionNote()"
+                                    @keydown="handleNotesKeydown($event)"
+                                    @paste="handleNotesPaste($event)"
+                                    data-placeholder="Catatan sesi: aku ngerjain apa tadi? #subject #difficulty"
+                                ></div>
+                                <div class="notes-footer">
+                                    <span class="notes-counter">
+                                        <span x-text="getNotesLength()"></span>/300
+                                    </span>
+                                    <div class="notes-tags" x-show="getNotesTags().length > 0">
+                                        <template x-for="tag in getNotesTags()" :key="tag">
+                                            <span class="note-tag" x-text="tag"></span>
+                                        </template>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex gap-3">
+                                <button class="modal-btn modal-btn-yes" @click="markTaskDone(true)">✓ Berhasil!</button>
+                                <button class="modal-btn modal-btn-no"  @click="markTaskDone(false)">✗ Belum</button>
+                            </div>
+                        </div>
+
+                        <div x-show="!task.trim()" class="flex gap-3 mt-2">
+                            <button class="modal-btn modal-btn-yes" @click="completeSessionModal()">
+                                ☕ Mulai Istirahat <span x-show="pendingBreakSec > 0" x-text="'(' + Math.round(pendingBreakSec/60) + 'm)'"></span>
+                            </button>
+                        </div>
+
+                        <button @click="completeSessionModal()" class="mt-4 text-xs" style="color:var(--col-muted);background:none;border:none;cursor:pointer">
+                            Lewati
+                        </button>
+                    </div>
                 </div>
-            </div>
 
-            <div x-show="!task.trim()" class="flex gap-3 mt-2">
-                <button class="modal-btn modal-btn-yes" @click="completeSessionModal()">
-                    ☕ Mulai Istirahat
-                </button>
             </div>
-
-            <button @click="completeSessionModal()" class="mt-4 text-xs" style="color:var(--col-muted);background:none;border:none;cursor:pointer">
-                Lewati
-            </button>
         </div>
     </div>
+
 
     <!-- Enhanced Chronotype Widget -->
     @auth
@@ -1015,6 +1282,8 @@
             longestStreak: 0,
             totalSessionsLifetime: 0,
             streakProgress: [],
+            xpPoints: {{ Auth::check() ? (Auth::user()->xp_points ?? 0) : 0 }},
+            level: {{ Auth::check() ? (Auth::user()->level ?? 1) : 1 }},
             currentMusic: null, 
             audioVolume: 0.5,
             task: localStorage.getItem('focus_task') || '',
@@ -1031,6 +1300,9 @@
             pendingSessionMinutes: 0,
             pendingSessionType: '',
             sessionNote: '',
+            showModal: false,
+            showRecapModal: false,
+            copyTextState: '📋 Salin Teks',
             popupWindow: null,
 
             // ── Fokus Utama 2.0 ──────────────────────────────────────────
@@ -1058,14 +1330,32 @@
                 this.applyMethod();
                 this.bindShortcuts();
                 this.syncPopupState();
-                // DISABLED: this.requestNotificationPermission();
+                this.initTheme();
+                this.requestNotificationPermission();
                 
                 // Make timer app instance globally available for task editor
                 window.timerAppInstance = this;
                 
-                // DISABLED: if ('Notification' in window && Notification.permission === 'granted') {
-                //     this.notificationsEnabled = true;
-                // }
+                if ('Notification' in window && Notification.permission === 'granted') {
+                    this.notificationsEnabled = true;
+                }
+            },
+
+            initTheme() {
+                // Load saved theme or default to dark (night mode)
+                const savedTheme = localStorage.getItem('theme') || 'dark';
+                this.setTheme(savedTheme);
+            },
+
+            toggleTheme() {
+                const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                this.setTheme(newTheme);
+            },
+
+            setTheme(theme) {
+                document.documentElement.setAttribute('data-theme', theme);
+                localStorage.setItem('theme', theme);
             },
 
             openTimerPopup() {
@@ -1195,20 +1485,6 @@
                         requireInteraction: true,
                         silent: false,
                         vibrate: [200, 100, 200],
-                        actions: [
-                            {
-                                action: 'start-break',
-                                title: '☕ Start Break'
-                            },
-                            {
-                                action: 'continue-focus',
-                                title: '🎯 Continue Focus'
-                            },
-                            {
-                                action: 'view-stats',
-                                title: 'View Stats'
-                            }
-                        ],
                         data: {
                             url: window.location.href,
                             timestamp: Date.now()
@@ -1281,6 +1557,8 @@
                         this.longestStreak = d.longest_streak ?? 0;
                         this.totalSessionsLifetime = d.total_sessions ?? 0;
                         this.streakProgress = d.streak_progress ?? [];
+                        if (d.xp_points !== undefined) this.xpPoints = d.xp_points;
+                        if (d.level !== undefined) this.level = d.level;
                     }
                 } catch(_) {}
             },
@@ -1324,12 +1602,13 @@
                     // Silent - no toast
                     return;
                 }
+                if (this.running) {
+                    this.stop();
+                }
                 this.customFocusMinutes = Math.max(1, Math.min(180, Number(this.customFocusMinutes) || 25));
                 this.customBreakMinutes = Math.max(1, Math.min(30, Number(this.customBreakMinutes) || 5));
-                this.currentMethod = {
-                    f: this.customFocusMinutes,
-                    b: this.customBreakMinutes,
-                };
+                this.customDurations[this.method].f = this.customFocusMinutes;
+                this.customDurations[this.method].b = this.customBreakMinutes;
                 this.applyMethod();
                 // Silent - no toast
             },
@@ -1353,10 +1632,10 @@
                         this.displayTime = 0; 
                         this.elapsedFocus = 0; 
                     }
-                    // Notif kontekstual saat mulai - disabled to prevent popup
-                    // if (this.task.trim()) {
-                    //     this.notify('🎯 Sesi Dimulai', `Fokus: ${this.task}`);
-                    // }
+                    // Notif kontekstual saat mulai
+                    if (this.task.trim()) {
+                        this.notify('🎯 Sesi Dimulai', `Fokus: ${this.task}`);
+                    }
                 }
                 
                 this.running = true;
@@ -1494,7 +1773,11 @@
             /* ── WEB NOTIFICATION HELPER ── */
             toggleNotifications() {
                 this.notificationsEnabled = !this.notificationsEnabled;
-                this.toast(this.notificationsEnabled ? 'Notifikasi aktif.' : 'Notifikasi dimatikan.');
+                if (this.notificationsEnabled && 'Notification' in window && Notification.permission !== 'granted') {
+                    this.requestNotificationPermission();
+                } else {
+                    this.toast(this.notificationsEnabled ? 'Notifikasi aktif.' : 'Notifikasi dimatikan.');
+                }
             },
 
             testNotification() {
@@ -1505,15 +1788,8 @@
             },
 
             notify(title, body) {
-                // DISABLED: All notifications for debugging
-                return;
-                // if (!this.notificationsEnabled || Notification.permission !== 'granted') return;
-                // new Notification(title, { 
-                //     body: body, 
-                //     icon: '/favicon.ico', 
-                //     badge: '/favicon.ico', 
-                //     silent: false 
-                // });
+                if (!this.notificationsEnabled || !('Notification' in window) || Notification.permission !== 'granted') return;
+                this.showNotification(title, body);
             },
 
             /* ── COMPLETION MODAL ── */
@@ -1609,6 +1885,8 @@
                         this.longestStreak = d.longest_streak ?? this.longestStreak;
                         this.totalSessionsLifetime = d.total_sessions ?? this.totalSessionsLifetime;
                         this.streakProgress = d.streak_progress ?? this.streakProgress;
+                        if (d.xp_points !== undefined) this.xpPoints = d.xp_points;
+                        if (d.level !== undefined) this.level = d.level;
                     } else {
                         const d = await r.json().catch(() => ({}));
                         if (r.status === 401 || d.requires_auth) {
@@ -1710,13 +1988,12 @@
             },
 
             exportDailyRecap() {
-                const summary = `Recap Hari Ini\n- Fokus: ${this.formatTime(this.totalFocusToday)}\n- Sesi: ${this.sessionsToday}\n- Streak: ${this.streak} hari\n- Fokus utama terakhir: ${this.task.trim() || '-'}`;
+                const summary = `Recap Hari Ini\n- Fokus: ${this.formatTime(this.totalFocusToday)}\n- Sesi: ${this.sessionsToday}\n- Streak: ${this.streak} hari\n- XP: ${this.xpPoints}\n- Fokus utama terakhir: ${this.task.trim() || '-'}`;
                 if (navigator.clipboard?.writeText) {
                     navigator.clipboard.writeText(summary).then(() => {
-                        // Silent - no toast
+                        this.copyTextState = '✅ Tersalin!';
+                        setTimeout(() => { this.copyTextState = '📋 Salin Teks'; }, 2000);
                     });
-                } else {
-                    // Silent - no toast
                 }
             },
 

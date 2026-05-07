@@ -12,6 +12,7 @@ Route::post('/api/sessions', [TimerController::class, 'storeSession'])->name('ti
 Route::get('/api/stats', [TimerController::class, 'stats'])->name('timer.stats');
 Route::get('/analytics', [TimerController::class, 'analytics'])->name('analytics');
 Route::get('/api/analytics', [TimerController::class, 'analyticsData'])->name('analytics.data');
+Route::get('/credits', [TimerController::class, 'credits'])->name('credits');
 Route::get('/api/recommendations', [TimerController::class, 'getRecommendations'])->name('recommendations');
 Route::get('/chronotype', [ChronotypeController::class, 'show'])->name('chronotype.show');
 Route::post('/chronotype', [ChronotypeController::class, 'store'])->name('chronotype.store');
