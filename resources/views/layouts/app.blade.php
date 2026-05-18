@@ -101,7 +101,7 @@
                                 :style="darkMode.isDark ? 'color:#cbd5e1' : 'color:#475569'" onmouseover="this.style.color=darkMode.isDark?'#fff':'#000'" onmouseout="this.style.color=darkMode.isDark?'#cbd5e1':'#475569'">Credits</a>
                             @else
                                 <a href="{{ route('login') }}" class="nav-item inline-block transition-colors px-3 py-2 rounded-lg opacity-50" 
-                                :style="darkMode.isDark ? 'color:#cbd5e1' : 'color:#475569'">History 🔒</a>
+                                :style="darkMode.isDark ? 'color:#cbd5e1' : 'color:#475569'">History🔒</a>
                             @endauth
                         </div>
 
