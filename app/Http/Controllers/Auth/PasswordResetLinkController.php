@@ -48,7 +48,7 @@ class PasswordResetLinkController extends Controller
 
         // Dev fallback: show reset link in UI when mail is not sent externally.
         $mailer = Config::get('mail.default');
-        if (!app()->runningUnitTests() && in_array($mailer, ['log', 'array'], true)) {
+        if (!app()->runningUnitTests() && app()->environment('local') && in_array($mailer, ['log', 'array'], true)) {
             $user = User::query()->where('email', $request->string('email')->toString())->first();
 
             if ($user) {
