@@ -320,14 +320,16 @@
         }
 
         .tech-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 1rem;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1.25rem;
             max-width: 900px;
             margin: 0 auto;
         }
 
         .tech-card {
+            width: 150px;
             background: var(--col-bg);
             border: 1px solid var(--col-border);
             border-radius: 16px;
@@ -388,8 +390,10 @@
                 font-size: 2.5rem;
             }
             
-            .tech-grid {
-                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            .tech-card {
+                width: calc(50% - 0.7rem);
+                max-width: 140px;
+                padding: 1rem;
             }
         }
 
@@ -452,7 +456,7 @@
                     <div class="tech-name">Laravel</div>
                 </div>
                 <div class="tech-card">
-                    <div class="tech-icon">⚡</div>
+                    <div class="tech-icon">🏔️</div>
                     <div class="tech-name">Alpine.js</div>
                 </div>
                 <div class="tech-card">
@@ -460,8 +464,12 @@
                     <div class="tech-name">TailwindCSS</div>
                 </div>
                 <div class="tech-card">
-                    <div class="tech-icon">📊</div>
-                    <div class="tech-name">Chart.js</div>
+                    <div class="tech-icon">⚡</div>
+                    <div class="tech-name">Vite</div>
+                </div>
+                <div class="tech-card">
+                    <div class="tech-icon">🍃</div>
+                    <div class="tech-name">Laravel Breeze</div>
                 </div>
                 <div class="tech-card">
                     <div class="tech-icon">🔧</div>

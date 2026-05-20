@@ -1,10 +1,10 @@
 <section>
-    <header>
-        <h2 class="text-lg font-medium text-slate-100">
+    <header class="mb-6">
+        <h2 class="text-xl font-bold" style="color: var(--col-text);">
             {{ __('Profile Information') }}
         </h2>
 
-        <p class="mt-1 text-sm text-slate-400">
+        <p class="mt-1 text-sm" style="color: var(--col-subtle);">
             {{ __("Update your account's profile information and email address.") }}
         </p>
     </header>
@@ -13,33 +13,45 @@
         @csrf
     </form>
 
-    <form method="post" action="{{ route('profile.update') }}" class="mt-6 space-y-6">
+    <form method="post" action="{{ route('profile.update') }}" class="space-y-6">
         @csrf
         @method('patch')
 
         <div>
-            <x-input-label for="name" :value="__('Name')" />
-            <x-text-input id="name" name="name" type="text" class="mt-1 block w-full" :value="old('name', $user->name)" required autofocus autocomplete="name" />
-            <x-input-error class="mt-2" :messages="$errors->get('name')" />
+            <label for="name" class="profile-input-label">{{ __('Name') }}</label>
+            <input id="name" name="name" type="text" class="profile-input" value="{{ old('name', $user->name) }}" required autofocus autocomplete="name" />
+            @if ($errors->get('name'))
+                <ul class="error-message">
+                    @foreach ((array) $errors->get('name') as $message)
+                        <li>{{ $message }}</li>
+                    @endforeach
+                </ul>
+            @endif
         </div>
 
         <div>
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" name="email" type="email" class="mt-1 block w-full" :value="old('email', $user->email)" required autocomplete="username" />
-            <x-input-error class="mt-2" :messages="$errors->get('email')" />
+            <label for="email" class="profile-input-label">{{ __('Email') }}</label>
+            <input id="email" name="email" type="email" class="profile-input" value="{{ old('email', $user->email) }}" required autocomplete="username" />
+            @if ($errors->get('email'))
+                <ul class="error-message">
+                    @foreach ((array) $errors->get('email') as $message)
+                        <li>{{ $message }}</li>
+                    @endforeach
+                </ul>
+            @endif
 
             @if ($user instanceof \Illuminate\Contracts\Auth\MustVerifyEmail && ! $user->hasVerifiedEmail())
-                <div>
-                    <p class="text-sm mt-2 text-slate-300">
+                <div class="mt-4 p-4 rounded-xl" style="background: var(--col-bg); border: 1px solid var(--col-border);">
+                    <p class="text-sm" style="color: var(--col-subtle);">
                         {{ __('Your email address is unverified.') }}
 
-                        <button form="send-verification" class="underline text-sm text-slate-400 hover:text-slate-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-400 focus:ring-offset-slate-900">
+                        <button form="send-verification" class="text-sm font-semibold hover:underline" style="color: var(--accent); background: none; border: none; padding: 0; cursor: pointer; margin-left: 0.5rem;">
                             {{ __('Click here to re-send the verification email.') }}
                         </button>
                     </p>
 
                     @if (session('status') === 'verification-link-sent')
-                        <p class="mt-2 font-medium text-sm text-emerald-400">
+                        <p class="mt-2 font-medium text-sm text-green-500">
                             {{ __('A new verification link has been sent to your email address.') }}
                         </p>
                     @endif
@@ -47,8 +59,10 @@
             @endif
         </div>
 
-        <div class="flex items-center gap-4">
-            <x-primary-button>{{ __('Save') }}</x-primary-button>
+        <div class="flex items-center gap-4 pt-4">
+            <button type="submit" class="profile-btn">
+                {{ __('Save Changes') }}
+            </button>
 
             @if (session('status') === 'profile-updated')
                 <p
@@ -56,8 +70,9 @@
                     x-show="show"
                     x-transition
                     x-init="setTimeout(() => show = false, 2000)"
-                    class="text-sm text-slate-400"
-                >{{ __('Saved.') }}</p>
+                    class="text-sm font-medium"
+                    style="color: var(--accent);"
+                >{{ __('Saved successfully.') }}</p>
             @endif
         </div>
     </form>

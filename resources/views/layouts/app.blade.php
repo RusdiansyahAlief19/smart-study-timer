@@ -97,6 +97,8 @@
                                 :style="darkMode.isDark ? 'color:#cbd5e1' : 'color:#475569'" onmouseover="this.style.color=darkMode.isDark?'#fff':'#000'" onmouseout="this.style.color=darkMode.isDark?'#cbd5e1':'#475569'">History</a>
                                 <a href="{{ route('analytics') }}" class="nav-item inline-block transition-colors px-3 py-2 rounded-lg" 
                                 :style="darkMode.isDark ? 'color:#cbd5e1' : 'color:#475569'" onmouseover="this.style.color=darkMode.isDark?'#fff':'#000'" onmouseout="this.style.color=darkMode.isDark?'#cbd5e1':'#475569'">Analytics</a>
+                                <a href="{{ route('profile.edit') }}" class="nav-item inline-block transition-colors px-3 py-2 rounded-lg" 
+                                :style="darkMode.isDark ? 'color:#cbd5e1' : 'color:#475569'" onmouseover="this.style.color=darkMode.isDark?'#fff':'#000'" onmouseout="this.style.color=darkMode.isDark?'#cbd5e1':'#475569'">Profile</a>
                                 <a href="{{ route('credits') }}" class="nav-item inline-block transition-colors px-3 py-2 rounded-lg cursor-pointer" 
                                 :style="darkMode.isDark ? 'color:#cbd5e1' : 'color:#475569'" onmouseover="this.style.color=darkMode.isDark?'#fff':'#000'" onmouseout="this.style.color=darkMode.isDark?'#cbd5e1':'#475569'">Credits</a>
                             @else
