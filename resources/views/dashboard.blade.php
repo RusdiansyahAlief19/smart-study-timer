@@ -727,7 +727,23 @@
 
             <div class="side-panel" style="padding:16px 18px;">
                 <div class="flex flex-wrap items-center gap-3">
-                    <p class="text-xs font-semibold" style="color:var(--col-subtle)">Custom Duration</p>
+                    <div x-data="{ showInfo: false }" class="relative flex items-center gap-2">
+                        <p class="text-xs font-semibold" style="color:var(--col-subtle)">Custom Duration</p>
+                        <button @click="showInfo = !showInfo" @click.away="showInfo = false" class="text-xs opacity-50 hover:opacity-100 transition-opacity" style="color:var(--col-subtle)">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                        </button>
+                        
+                        <!-- Popover Info -->
+                        <div x-show="showInfo" x-transition.opacity style="display: none; background:var(--col-surface); border-color:var(--col-border); color:var(--col-text);" class="absolute left-0 top-6 z-50 p-4 rounded-xl shadow-xl border w-72 text-xs leading-relaxed">
+                            <p class="mb-2 font-bold" style="color:var(--col-text)">Kenapa cuma untuk Pomodoro & 52/17?</p>
+                            <ul class="list-disc pl-4 space-y-2" style="color:var(--col-subtle)">
+                                <li><strong>Flowtime:</strong> Timer menghitung naik tanpa batas.</li>
+                                <li><strong>2-Min Rule:</strong> Trik psikologis ini akan hilang kekuatannya jika bukan 2 menit.</li>
+                                <li><strong>2-3-5-7:</strong> Rantai berurutan angka prima akan rusak jika diubah bebas.</li>
+                                <li><strong>Animedoro:</strong> Aturan bakunya adalah 40 menit kerja + 20 menit hiburan.</li>
+                            </ul>
+                        </div>
+                    </div>
                     <span class="text-[11px]" style="color:var(--col-muted)">Pomodoro / 52-17</span>
                     <label class="text-xs" style="color:var(--col-subtle)">Focus
                         <input type="number" min="1" max="180" class="duration-input ml-1" x-model.number="customFocusMinutes">
@@ -784,13 +800,14 @@
                     <svg class="timer-ring" width="280" height="280" viewBox="0 0 280 280">
                         <circle class="ring-track" cx="140" cy="140" r="124" stroke-width="8" fill="none" transform="rotate(-90 140 140)"/>
                         <circle class="ring-fill" :class="{ running: running }"
+                                :style="phase === 'break' ? 'stroke: #10b981;' : ''"
                                 cx="140" cy="140" r="124" stroke-width="8" fill="none" stroke-linecap="round"
                                 :stroke-dasharray="780" :stroke-dashoffset="780 - (780 * ringProgress / 100)"
                                 transform="rotate(-90 140 140)"/>
                     </svg>
                     <div class="absolute flex flex-col items-center select-none">
-                        <span class="timer-font timer-value font-extrabold tracking-tighter" x-text="formatTime(displayTime)"></span>
-                        <span class="text-xs mt-2 uppercase tracking-widest" style="color:var(--col-subtle)" x-text="phaseLabel"></span>
+                        <span class="timer-font timer-value font-extrabold tracking-tighter" :style="phase === 'break' ? 'color: #10b981;' : ''" x-text="formatTime(displayTime)"></span>
+                        <span class="text-xs mt-2 uppercase tracking-widest font-bold" :style="phase === 'break' ? 'color: #10b981;' : 'color:var(--col-subtle)'" x-text="phaseLabel"></span>
                         {{-- Task label di dalam ring ──────────────────────────── --}}
                         <span class="task-ring-label" x-show="task.trim() && phase !== 'idle'" x-text="task"
                               x-transition:enter="transition ease-out duration-300"
@@ -1016,8 +1033,7 @@
                                     @keydown="handleNotesKeydown($event)"
                                     @paste="handleNotesPaste($event)"
                                     data-placeholder="Catatan sesi: aku ngerjain apa tadi? #subject #difficulty"
-                                ></div>
-                                <div class="notes-footer">
+                        <div class="notes-footer">
                                     <span class="notes-counter">
                                         <span x-text="getNotesLength()"></span>/300
                                     </span>
@@ -1032,17 +1048,58 @@
                                 <button class="modal-btn modal-btn-yes" @click="markTaskDone(true)">✓ Berhasil!</button>
                                 <button class="modal-btn modal-btn-no"  @click="markTaskDone(false)">✗ Belum</button>
                             </div>
+                            <div class="flex items-center gap-2 mt-3 justify-center w-full">
+                                <button class="text-xs px-4 py-2 rounded-xl font-bold transition-all" style="background:var(--col-surface); color:var(--col-text); border: 2px solid var(--col-border); flex-1;" @click="snoozeFocus(snoozeMinutes)">
+                                    ⏳ Snooze
+                                </button>
+                                <input type="number" x-model="snoozeMinutes" min="1" max="60" class="w-16 px-2 py-2 rounded-xl text-center text-xs font-bold" style="background:var(--col-bg); border: 2px solid var(--col-border); color:var(--col-text);">
+                                <span class="text-xs" style="color:var(--col-subtle)">m</span>
+                            </div>
                         </div>
 
-                        <div x-show="!task.trim()" class="flex gap-3 mt-2">
-                            <button class="modal-btn modal-btn-yes" @click="completeSessionModal()">
-                                ☕ Mulai Istirahat <span x-show="pendingBreakSec > 0" x-text="'(' + Math.round(pendingBreakSec/60) + 'm)'"></span>
+                        <div x-show="!task.trim()" class="flex flex-col gap-3 mt-2">
+                            <button class="modal-btn modal-btn-yes w-full" @click="completeSessionModal()">
+                                <template x-if="pendingBreakSec > 0">
+                                    <span>☕ Mulai Istirahat <span x-text="'(' + Math.round(pendingBreakSec/60) + 'm)'"></span></span>
+                                </template>
+                                <template x-if="pendingBreakSec === 0">
+                                    <span>✓ Selesai Sesi</span>
+                                </template>
+                            </button>
+                            <div class="flex items-center gap-2 w-full">
+                                <button class="text-xs px-4 py-2 rounded-xl font-bold transition-all" style="background:var(--col-surface); color:var(--col-text); border: 2px solid var(--col-border); flex-1;" @click="snoozeFocus(snoozeMinutes)">
+                                    ⏳ Snooze Fokus
+                                </button>
+                                <input type="number" x-model="snoozeMinutes" min="1" max="60" class="w-16 px-2 py-2 rounded-xl text-center text-xs font-bold" style="background:var(--col-bg); border: 2px solid var(--col-border); color:var(--col-text);">
+                                <span class="text-xs" style="color:var(--col-subtle)">m</span>
+                            </div>
+                            <button @click="completeSessionModal()" class="mt-4 text-xs" style="color:var(--col-muted);background:none;border:none;cursor:pointer">
+                                Lewati
                             </button>
                         </div>
+                    </div>
+                </div>
 
-                        <button @click="completeSessionModal()" class="mt-4 text-xs" style="color:var(--col-muted);background:none;border:none;cursor:pointer">
-                            Lewati
-                        </button>
+                {{-- ══════════════ BREAK COMPLETION MODAL ══════════════ --}}
+                <div class="completion-modal-bg" :class="{ open: showBreakModal }" @click.self="showBreakModal = false">
+                    <div class="completion-modal">
+                        <div style="font-size:2.5rem;margin-bottom:6px">☕</div>
+                        <h3 class="font-bold text-lg mb-2">Waktu Istirahat Selesai!</h3>
+                        <p class="text-xs mb-4" style="color:var(--col-subtle)">
+                            Apakah kamu sudah siap untuk kembali fokus?
+                        </p>
+                        <div class="flex flex-col gap-3">
+                            <button class="modal-btn modal-btn-yes w-full" style="background: var(--accent);" @click="showBreakModal = false; applyMethod(); start();">
+                                ▶️ Mulai Fokus Selanjutnya
+                            </button>
+                            <div class="flex items-center gap-2 w-full">
+                                <button class="text-xs px-4 py-2 rounded-xl font-bold transition-all" style="background:var(--col-surface); color:var(--col-text); border: 2px solid var(--col-border); flex-1;" @click="snoozeBreak(snoozeMinutes)">
+                                    ⏳ Tambah Istirahat
+                                </button>
+                                <input type="number" x-model="snoozeMinutes" min="1" max="60" class="w-16 px-2 py-2 rounded-xl text-center text-xs font-bold" style="background:var(--col-bg); border: 2px solid var(--col-border); color:var(--col-text);">
+                                <span class="text-xs" style="color:var(--col-subtle)">m</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -1301,12 +1358,13 @@
             pendingSessionType: '',
             sessionNote: '',
             showModal: false,
+            showBreakModal: false,
+            snoozeMinutes: 5,
             showRecapModal: false,
             copyTextState: '📋 Salin Teks',
             popupWindow: null,
 
             // ── Fokus Utama 2.0 ──────────────────────────────────────────
-            showModal: false,
             lastSessionDuration: 0,
             lastSessionMethod: '',
             pendingBreakSec: 0,
@@ -1322,7 +1380,10 @@
                     '2min': '2-min rule', 
                     '2357': `sesi ${this.seqIndex + 1}/4` 
                 };
-                return map[this.method] || '';
+                const methodStr = map[this.method] || '';
+                if (this.phase === 'focus') return `🎯 FOKUS - ${methodStr}`;
+                if (this.phase === 'break') return `☕ ISTIRAHAT - ${methodStr}`;
+                return `⏸️ STANDBY - ${methodStr}`;
             },
 
             init() {
@@ -1585,7 +1646,7 @@
                     '5217':     { f: this.customDurations['5217'].f * 60, b: this.customDurations['5217'].b * 60 },
                     'flowtime': { f: 0,       b: 0       },
                     'animedoro':{ f: this.animedoroDuration * 60, b: 20 * 60 },
-                    '2min':     { f: 2 * 60,  b: 0       },
+                    '2min':     { f: 2 * 60,  b: 5 * 60  }, // Tambahkan istirahat 5 menit untuk 2-min rule
                     '2357':     { f: this.seqSteps[0] * 60, b: this.seqBreakSec },
                 };
                 
@@ -1766,8 +1827,8 @@
                     return;
                 }
                 
+                this.showBreakModal = true;
                 this.notify("🚀 Istirahat Selesai!", "Siap untuk sesi berikutnya?");
-                this.applyMethod();
             },
 
             /* ── WEB NOTIFICATION HELPER ── */
@@ -1852,6 +1913,22 @@
                 this.flushPendingSession();
                 this.startBreakFromModal();
                 this.showNotification('🎯 Focus Session Complete!', 'Great job! Time for a well-deserved break.', null, 'complete');
+            },
+
+            snoozeFocus(minutes) {
+                this.showModal = false;
+                const addedSecs = parseInt(minutes) * 60;
+                // Add to duration so it gets saved properly at the end
+                this.focusDuration += addedSecs;
+                this.displayTime = addedSecs;
+                this.phase = 'focus';
+                this.start();
+            },
+
+            snoozeBreak(minutes) {
+                this.showBreakModal = false;
+                const addedSecs = parseInt(minutes) * 60;
+                this.startBreak(addedSecs);
             },
 
             /* ── persist & audio & utils ── */

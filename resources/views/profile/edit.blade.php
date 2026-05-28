@@ -153,6 +153,10 @@
             </div>
 
             <div class="space-y-6">
+                <div class="profile-card" style="border-color: var(--accent); background: linear-gradient(145deg, var(--col-surface) 0%, rgba(74, 158, 255, 0.03) 100%);">
+                    @include('profile.partials.user-level-info')
+                </div>
+
                 <div class="profile-card">
                     @include('profile.partials.update-profile-information-form')
                 </div>

@@ -28,6 +28,12 @@ class User extends Authenticatable
         'chronotype',
         'optimal_study_hours',
         'chronotype_completed',
+        'streak_count',
+        'last_streak_date',
+        'total_sessions',
+        'longest_streak',
+        'xp_points',
+        'level',
     ];
 
     /**

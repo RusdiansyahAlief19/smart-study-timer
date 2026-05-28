@@ -142,8 +142,7 @@ class TimerController extends Controller
         $currentXP = (int) $user->xp_points + $xpGained;
         $newLevel = $this->calculateLevel($currentXP);
 
-        // Check for achievements
-        $newAchievements = $this->checkAchievements($user, $validated['duration_minutes'], $newStreak);
+
 
         $user->update([
             'streak_count'     => $newStreak,
@@ -431,26 +430,8 @@ class TimerController extends Controller
      */
     private function calculateXP(int $minutes, string $method): int
     {
-        $baseXP = $minutes;
-        
-        // Bonus XP for different methods
-        $methodBonus = [
-            'pomodoro' => 1.0,
-            '5217' => 1.2,
-            'flowtime' => 1.5,
-            'animedoro' => 1.3,
-            '2min' => 0.5,
-            '2357' => 1.4
-        ];
-
-        $multiplier = $methodBonus[$method] ?? 1.0;
-        
-        // Streak bonus
-        $streakBonus = 1.0;
-        if (Auth::user()->streak_count >= 7) $streakBonus = 1.5;
-        elseif (Auth::user()->streak_count >= 3) $streakBonus = 1.2;
-
-        return (int) round($baseXP * $multiplier * $streakBonus);
+        // Berdasarkan permintaan, 1 menit = 2 XP untuk SEMUA metode
+        return $minutes * 2;
     }
 
     /**
@@ -474,49 +455,6 @@ class TimerController extends Controller
         return (int) round(100 * pow($level, 1.5));
     }
 
-    /**
-     * Check for new achievements.
-     */
-    private function checkAchievements(User $user, int $minutes, int $streak): array
-    {
-        $achievements = [];
-        
-        // Week Warrior - 7 day streak
-        if ($streak >= 7 && $user->streak_count < 7) {
-            $achievements[] = [
-                'id' => 'week_warrior',
-                'title' => '🏆 Week Warrior',
-                'description' => '7-day streak achieved!',
-                'xp_bonus' => 50
-            ];
-        }
-
-        // Focus Master - 100 sessions
-        if ($user->total_sessions >= 100) {
-            $achievements[] = [
-                'id' => 'focus_master',
-                'title' => '🔥 Focus Master',
-                'description' => '100 study sessions completed!',
-                'xp_bonus' => 100
-            ];
-        }
-
-        // Speed Learner - 5 sessions in one day
-        $todaySessions = StudySession::where('user_id', $user->id)
-            ->where('session_date', today())
-            ->count();
-        
-        if ($todaySessions >= 5) {
-            $achievements[] = [
-                'id' => 'speed_learner',
-                'title' => '⚡ Speed Learner',
-                'description' => '5 sessions completed in one day!',
-                'xp_bonus' => 30
-            ];
-        }
-
-        return $achievements;
-    }
 
     /**
      * Get smart recommendations for the user.

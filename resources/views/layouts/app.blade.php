@@ -48,7 +48,7 @@
         });
     </script>
     </head>
-    <body class="antialiased" style="font-family:'Inter',sans-serif;background:#0d0f14;color:#e4e8f5;" x-data="{ showCredits: false, darkMode: Alpine.store('darkMode') }">
+    <body class="antialiased" style="font-family:'Inter',sans-serif;background:#0d0f14;color:#e4e8f5;" x-data="{ showCredits: false, mobileMenuOpen: false, darkMode: Alpine.store('darkMode') }">
         <div class="min-h-screen relative overflow-hidden" style="background:#0d0f14;" :style="darkMode.isDark ? 'background:#0d0f14' : 'background:#ffffff'">
             <div style="position:absolute;inset:0;pointer-events:none;background:
                 radial-gradient(900px 420px at 12% -8%, rgba(76, 128, 255, .17), transparent 60%),
@@ -57,10 +57,10 @@
             </div>
 
             <div class="relative z-[9999] w-full pt-4 px-4 sm:px-6 pointer-events-none flex justify-center">
-                <header class="inline-flex max-w-full rounded-full shadow-[0_8px_30px_rgb(0,0,0,0.12)] border transition-colors duration-300 pointer-events-auto text-left" 
+                <header class="flex md:inline-flex w-full md:w-auto max-w-full rounded-full shadow-[0_8px_30px_rgb(0,0,0,0.12)] border transition-colors duration-300 pointer-events-auto text-left" 
                 style="backdrop-filter:blur(12px);" 
                 :style="darkMode.isDark ? 'background:rgba(15,19,28,.85);border-color:rgba(69,86,126,.3)' : 'background:rgba(255,255,255,.95);border-color:rgba(226,232,240,.8)'">
-                    <div class="px-6 md:px-10 h-16 flex items-center justify-center" style="gap: 170px;">
+                    <div class="px-4 md:px-10 h-16 flex items-center justify-between md:justify-center w-full gap-4 md:gap-10 lg:gap-[100px] xl:gap-[170px]">
                         
                         <!-- Left: Logo -->
                         <div class="flex-shrink-0 flex items-center gap-4">
@@ -127,7 +127,7 @@
 
                             <!-- CTA Button -->
                             @auth
-                                <form method="POST" action="{{ route('logout') }}" class="inline-block m-0 p-0">
+                                <form method="POST" action="{{ route('logout') }}" class="hidden md:inline-block m-0 p-0">
                                     @csrf
                                     <button type="submit" class="nav-item block px-5 py-2 rounded-full transition-transform" 
                                             :style="darkMode.isDark ? 'background:#e4e8f5;color:#0f172a' : 'background:#0f172a;color:#ffffff'">
@@ -135,15 +135,49 @@
                                     </button>
                                 </form>
                             @else
-                                <a href="{{ route('login') }}" class="nav-item inline-block px-5 py-2 rounded-full transition-transform" 
+                                <a href="{{ route('login') }}" class="hidden md:inline-block nav-item px-5 py-2 rounded-full transition-transform" 
                                    :style="darkMode.isDark ? 'background:#e4e8f5;color:#0f172a' : 'background:#0f172a;color:#ffffff'">
                                     Get Started
                                 </a>
                             @endauth
+
+                            <!-- Hamburger Button -->
+                            <button @click="mobileMenuOpen = !mobileMenuOpen" class="md:hidden p-2 rounded-lg transition-colors focus:outline-none" :style="darkMode.isDark ? 'hover:bg-gray-800' : 'hover:bg-gray-100'">
+                                <svg x-show="!mobileMenuOpen" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                                <svg x-show="mobileMenuOpen" x-cloak class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
+                            </button>
                         </div>
 
                     </div>
                 </header>
+
+                <!-- Mobile Menu Dropdown -->
+                <div x-show="mobileMenuOpen" 
+                     x-transition.opacity
+                     x-cloak
+                     @click.away="mobileMenuOpen = false"
+                     class="absolute top-[80px] left-4 right-4 rounded-2xl shadow-xl border pointer-events-auto z-50 md:hidden overflow-hidden"
+                     style="backdrop-filter:blur(12px);"
+                     :style="darkMode.isDark ? 'background:rgba(15,19,28,.95);border-color:rgba(69,86,126,.3)' : 'background:rgba(255,255,255,.98);border-color:rgba(226,232,240,.8)'">
+                     <div class="flex flex-col p-4 space-y-2 font-semibold text-sm">
+                         @if(!request()->routeIs('dashboard'))
+                             <a href="{{ route('dashboard') }}" class="block px-4 py-3 rounded-xl transition-colors" :style="darkMode.isDark ? 'hover:bg-gray-800' : 'hover:bg-gray-100'">Timer</a>
+                         @endif
+                         @auth
+                             <a href="{{ route('history') }}" class="block px-4 py-3 rounded-xl transition-colors" :style="darkMode.isDark ? 'hover:bg-gray-800' : 'hover:bg-gray-100'">History</a>
+                             <a href="{{ route('analytics') }}" class="block px-4 py-3 rounded-xl transition-colors" :style="darkMode.isDark ? 'hover:bg-gray-800' : 'hover:bg-gray-100'">Analytics</a>
+                             <a href="{{ route('profile.edit') }}" class="block px-4 py-3 rounded-xl transition-colors" :style="darkMode.isDark ? 'hover:bg-gray-800' : 'hover:bg-gray-100'">Profile</a>
+                             <a href="{{ route('credits') }}" class="block px-4 py-3 rounded-xl transition-colors" :style="darkMode.isDark ? 'hover:bg-gray-800' : 'hover:bg-gray-100'">Credits</a>
+                             <form method="POST" action="{{ route('logout') }}" class="m-0 p-0 border-t mt-2 pt-2" :style="darkMode.isDark ? 'border-color:rgba(255,255,255,0.1)' : 'border-color:rgba(0,0,0,0.1)'">
+                                 @csrf
+                                 <button type="submit" class="w-full text-left px-4 py-3 rounded-xl transition-colors" :style="darkMode.isDark ? 'hover:bg-gray-800' : 'hover:bg-gray-100'">Log Out</button>
+                             </form>
+                         @else
+                             <a href="{{ route('login') }}" class="block px-4 py-3 rounded-xl transition-colors" :style="darkMode.isDark ? 'hover:bg-gray-800' : 'hover:bg-gray-100'">History 🔒</a>
+                             <a href="{{ route('login') }}" class="block px-4 py-3 rounded-xl transition-colors border-t mt-2 pt-2" :style="darkMode.isDark ? 'hover:bg-gray-800 border-color:rgba(255,255,255,0.1)' : 'hover:bg-gray-100 border-color:rgba(0,0,0,0.1)'">Get Started</a>
+                         @endauth
+                     </div>
+                </div>
             </div>
 
             <main class="relative z-[2] pt-16">

@@ -16,8 +16,32 @@ class ProfileController extends Controller
      */
     public function edit(Request $request): View
     {
+        $user = $request->user();
+        
+        $level = (int) $user->level;
+        $currentXP = (int) $user->xp_points;
+        
+        $currentLevelBaseXP = $level <= 1 ? 0 : (int) round(100 * pow($level, 1.5));
+        $nextLevelBaseXP = (int) round(100 * pow($level + 1, 1.5));
+        
+        $xpRequired = $nextLevelBaseXP - $currentLevelBaseXP;
+        $xpEarnedInLevel = max(0, $currentXP - $currentLevelBaseXP);
+        $xpProgress = $xpRequired > 0 ? min(100, round(($xpEarnedInLevel / $xpRequired) * 100)) : 100;
+        
+        $levelTitle = 'Novice Scholar 🌱';
+        if ($level >= 50) $levelTitle = 'Grandmaster of Focus 👑';
+        elseif ($level >= 35) $levelTitle = 'Flow State Guru 🌊';
+        elseif ($level >= 20) $levelTitle = 'Time Master ⏳';
+        elseif ($level >= 10) $levelTitle = 'Productivity Adept ⚡';
+        elseif ($level >= 5) $levelTitle = 'Focused Learner 📖';
+
         return view('profile.edit', [
-            'user' => $request->user(),
+            'user' => $user,
+            'currentXP' => $currentXP,
+            'currentLevelBaseXP' => $currentLevelBaseXP,
+            'nextLevelBaseXP' => $nextLevelBaseXP,
+            'xpProgress' => $xpProgress,
+            'levelTitle' => $levelTitle,
         ]);
     }
 
