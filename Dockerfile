@@ -50,5 +50,5 @@ RUN chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 # Render otomatis meneruskan trafik HTTP. Apache secara default berjalan di port 80.
 EXPOSE 80
 
-# Menjalankan Apache di foreground
-CMD ["apache2-foreground"]
+# Menjalankan migrasi, mengatur port Apache sesuai $PORT dari Railway, dan menjalankan Apache
+CMD php artisan migrate --force && sed -i "s/80/$PORT/g" /etc/apache2/sites-available/000-default.conf /etc/apache2/ports.conf && apache2-foreground

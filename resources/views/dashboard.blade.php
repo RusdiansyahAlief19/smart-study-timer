@@ -1400,6 +1400,48 @@
                 if ('Notification' in window && Notification.permission === 'granted') {
                     this.notificationsEnabled = true;
                 }
+
+                // Restore state if exists
+                const savedState = localStorage.getItem('timer_bg_state');
+                if (savedState) {
+                    try {
+                        const s = JSON.parse(savedState);
+                        this.method = s.method;
+                        this.applyMethod();
+                        this.phase = s.phase;
+                        this.focusDuration = s.focusDuration;
+                        this.breakDuration = s.breakDuration;
+                        this.task = s.task || '';
+                        this.seqIndex = s.seqIndex || 0;
+                        
+                        if (this.method === 'flowtime' && s.startTime) {
+                            this.expectedStartTime = s.startTime;
+                            this.elapsedFocus = Math.floor((Date.now() - s.startTime) / 1000);
+                            this.displayTime = this.elapsedFocus;
+                            this.running = true;
+                            this.interval = setInterval(() => this.tick(), 1000);
+                        } else if (s.endTime) {
+                            this.expectedEndTime = s.endTime;
+                            let remaining = Math.floor((s.endTime - Date.now()) / 1000);
+                            if (remaining > 0) {
+                                if (this.phase === 'focus') this.displayTime = remaining;
+                                else this.breakTimeLeft = remaining;
+                                this.running = true;
+                                this.interval = setInterval(() => this.tick(), 1000);
+                            } else {
+                                if (this.phase === 'focus') {
+                                    this.displayTime = 0;
+                                    this.focusComplete();
+                                } else {
+                                    this.breakTimeLeft = 0;
+                                    this.breakComplete();
+                                }
+                            }
+                        }
+                    } catch(e) {
+                        this.clearTimerState();
+                    }
+                }
             },
 
             initTheme() {
@@ -1681,6 +1723,39 @@
                 }
             },
 
+            expectedEndTime: null,
+            expectedStartTime: null,
+
+            saveTimerState() {
+                if (!this.running) return;
+                let state = {
+                    method: this.method,
+                    phase: this.phase,
+                    focusDuration: this.focusDuration,
+                    breakDuration: this.breakDuration,
+                    task: this.task,
+                    seqIndex: this.seqIndex
+                };
+                
+                if (this.method === 'flowtime') {
+                    if (!this.expectedStartTime) this.expectedStartTime = Date.now() - (this.elapsedFocus * 1000);
+                    state.startTime = this.expectedStartTime;
+                } else if (this.phase === 'focus') {
+                    if (!this.expectedEndTime) this.expectedEndTime = Date.now() + (this.displayTime * 1000);
+                    state.endTime = this.expectedEndTime;
+                } else if (this.phase === 'break') {
+                    if (!this.expectedEndTime) this.expectedEndTime = Date.now() + (this.breakTimeLeft * 1000);
+                    state.endTime = this.expectedEndTime;
+                }
+                localStorage.setItem('timer_bg_state', JSON.stringify(state));
+            },
+
+            clearTimerState() {
+                localStorage.removeItem('timer_bg_state');
+                this.expectedEndTime = null;
+                this.expectedStartTime = null;
+            },
+
             start() {
                 if (this.running) return;
                 
@@ -1699,7 +1774,16 @@
                     }
                 }
                 
+                if (this.method === 'flowtime') {
+                    this.expectedStartTime = Date.now() - (this.elapsedFocus * 1000);
+                } else if (this.phase === 'focus') {
+                    this.expectedEndTime = Date.now() + (this.displayTime * 1000);
+                } else if (this.phase === 'break') {
+                    this.expectedEndTime = Date.now() + (this.breakTimeLeft * 1000);
+                }
+
                 this.running = true;
+                this.saveTimerState();
                 this.interval = setInterval(() => this.tick(), 1000);
                 this.syncPopupState();
             },
@@ -1708,6 +1792,7 @@
                 clearInterval(this.interval); 
                 this.interval = null; 
                 this.running = false; 
+                this.clearTimerState();
                 this.syncPopupState();
             },
 
@@ -1731,14 +1816,25 @@
 
             tickFocus() {
                 if (this.method === 'flowtime') {
-                    this.elapsedFocus++; 
+                    if (this.expectedStartTime) {
+                        this.elapsedFocus = Math.floor((Date.now() - this.expectedStartTime) / 1000);
+                    } else {
+                        this.elapsedFocus++; 
+                    }
                     this.displayTime = this.elapsedFocus;
                     this.ringProgress = Math.min(100, (this.elapsedFocus / (90 * 60)) * 100);
-                } else if (this.displayTime > 0) {
-                    this.displayTime--; 
-                    this.ringProgress = (this.displayTime / this.focusDuration) * 100;
-                } else { 
-                    this.focusComplete(); 
+                } else {
+                    if (this.expectedEndTime) {
+                        this.displayTime = Math.max(0, Math.floor((this.expectedEndTime - Date.now()) / 1000));
+                    } else {
+                        this.displayTime--; 
+                    }
+
+                    if (this.displayTime > 0) {
+                        this.ringProgress = (this.displayTime / this.focusDuration) * 100;
+                    } else { 
+                        this.focusComplete(); 
+                    }
                 }
             },
 
@@ -1750,14 +1846,10 @@
                 if (this.method === '2357') {
                     if (this.seqIndex < this.seqSteps.length - 1) {
                         this.saveSession(Math.round(focusSec / 60), this.method);
-                        this.phase = 'break'; 
-                        this.breakTimeLeft = this.seqBreakSec; 
-                        this.displayTime = this.seqBreakSec;
                         
                         this.notify("✅ Sesi Selesai", `Sesi ${this.seqIndex + 1} selesai. Jeda ${this.seqBreakSec}s.`);
                         
-                        this.running = true; 
-                        this.interval = setInterval(() => this.tick(), 1000);
+                        this.startBreak(this.seqBreakSec);
                         return;
                     } else {
                         this.notify("🎉 Selesai!", "Rangkaian sesi 2-3-5-7 telah selesai.");
@@ -1793,15 +1885,22 @@
                 this.displayTime = sec; 
                 this.ringProgress = 100;
                 
+                this.expectedEndTime = Date.now() + (sec * 1000);
+                
                 this.running = true; 
+                this.saveTimerState();
                 this.interval = setInterval(() => this.tick(), 1000);
             },
 
             tickBreak() {
-                if (this.breakTimeLeft > 0) {
+                if (this.expectedEndTime) {
+                    this.breakTimeLeft = Math.max(0, Math.floor((this.expectedEndTime - Date.now()) / 1000));
+                } else {
                     this.breakTimeLeft--; 
-                    this.displayTime = this.breakTimeLeft;
-                    
+                }
+                this.displayTime = this.breakTimeLeft;
+                
+                if (this.breakTimeLeft > 0) {
                     const total = (this.method === '2357' ? this.seqBreakSec : (this.method === 'flowtime' ? this.calcBreak(this.elapsedFocus) : this.breakDuration));
                     this.ringProgress = (this.breakTimeLeft / total) * 100;
                 } else { 
@@ -1822,8 +1921,7 @@
                     
                     this.notify("▶️ Sesi Berikutnya", `Mulai sesi ${this.seqSteps[this.seqIndex]}m!`);
                     
-                    this.running = true; 
-                    this.interval = setInterval(() => this.tick(), 1000);
+                    this.start();
                     return;
                 }
                 
