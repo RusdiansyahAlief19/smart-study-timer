@@ -6,6 +6,10 @@ use Illuminate\Support\Facades\Route;
 
 Route::redirect('/', '/dashboard');
 
+Route::get('/health', function () {
+    return response('OK', 200);
+});
+
 Route::get('/dashboard', [TimerController::class, 'index'])->name('dashboard');
 Route::view('/timer-popup', 'timer-popup')->name('timer.popup');
 Route::post('/api/sessions', [TimerController::class, 'storeSession'])->name('timer.store');
