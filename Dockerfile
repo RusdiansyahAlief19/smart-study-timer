@@ -17,8 +17,9 @@ RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 # Menginstal ekstensi PHP yang dibutuhkan Laravel
 RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip
 
-# Mengaktifkan Apache mod_rewrite (penting untuk routing Laravel)
-RUN a2enmod rewrite
+# Mengaktifkan Apache mod_rewrite dan memastikan MPM prefork digunakan
+RUN a2dismod mpm_event mpm_worker || true \
+    && a2enmod mpm_prefork rewrite
 
 # Menginstal Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
