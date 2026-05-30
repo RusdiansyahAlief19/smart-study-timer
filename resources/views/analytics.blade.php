@@ -458,7 +458,7 @@
                 try {
                     const params = new URLSearchParams();
                     params.append('period', 'month');
-                    params.append('month', this.selectedMonth);
+                    params.append('month', parseInt(this.selectedMonth) + 1);
                     params.append('year', this.selectedYear);
                     
                     const response = await fetch(`/api/analytics?${params.toString()}`);
