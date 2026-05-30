@@ -1303,7 +1303,7 @@
     </style>
 
     <div id="toast"></div>
-    <div class="mini-timer" x-data x-show="showMiniTimer">
+    <div class="mini-timer" x-show="showMiniTimer">
         <div class="flex items-center justify-between mb-1">
             <p class="text-[10px] uppercase tracking-wider" style="color:var(--col-subtle);" x-text="phaseLabel"></p>
             <button class="text-[10px]" style="color:var(--col-muted);" @click="showMiniTimer = false">hide</button>
