@@ -1401,6 +1401,16 @@
                     this.notificationsEnabled = true;
                 }
 
+                // Initialize Web Worker for accurate background timer
+                if (window.Worker) {
+                    this.timerWorker = new Worker('/timer-worker.js');
+                    this.timerWorker.onmessage = (e) => {
+                        if (e.data === 'tick') {
+                            this.tick();
+                        }
+                    };
+                }
+
                 // Restore state if exists
                 const savedState = localStorage.getItem('timer_bg_state');
                 if (savedState) {
@@ -1419,7 +1429,7 @@
                             this.elapsedFocus = Math.floor((Date.now() - s.startTime) / 1000);
                             this.displayTime = this.elapsedFocus;
                             this.running = true;
-                            this.interval = setInterval(() => this.tick(), 1000);
+                            if (this.timerWorker) { this.timerWorker.postMessage('start'); } else { this.interval = setInterval(() => this.tick(), 1000); }
                         } else if (s.endTime) {
                             this.expectedEndTime = s.endTime;
                             let remaining = Math.floor((s.endTime - Date.now()) / 1000);
@@ -1427,7 +1437,7 @@
                                 if (this.phase === 'focus') this.displayTime = remaining;
                                 else this.breakTimeLeft = remaining;
                                 this.running = true;
-                                this.interval = setInterval(() => this.tick(), 1000);
+                                if (this.timerWorker) { this.timerWorker.postMessage('start'); } else { this.interval = setInterval(() => this.tick(), 1000); }
                             } else {
                                 if (this.phase === 'focus') {
                                     this.displayTime = 0;
@@ -1807,13 +1817,13 @@
 
                 this.running = true;
                 this.saveTimerState();
-                this.interval = setInterval(() => this.tick(), 1000);
+                if (this.timerWorker) { this.timerWorker.postMessage('start'); } else { this.interval = setInterval(() => this.tick(), 1000); }
                 this.syncPopupState();
             },
 
             pause() { 
-                clearInterval(this.interval); 
-                this.interval = null; 
+                if (this.timerWorker) { this.timerWorker.postMessage('stop'); }
+                if (this.interval) { clearInterval(this.interval); this.interval = null; }
                 this.running = false; 
                 this.clearTimerState();
                 this.syncPopupState();
