@@ -1403,8 +1403,8 @@
 
                 // Initialize Web Worker for accurate background timer
                 if (window.Worker) {
-                    this.timerWorker = new Worker('/timer-worker.js');
-                    this.timerWorker.onmessage = (e) => {
+                    window.timerWorker = new Worker('/timer-worker.js');
+                    window.timerWorker.onmessage = (e) => {
                         if (e.data === 'tick') {
                             this.tick();
                         }
@@ -1429,7 +1429,7 @@
                             this.elapsedFocus = Math.floor((Date.now() - s.startTime) / 1000);
                             this.displayTime = this.elapsedFocus;
                             this.running = true;
-                            if (this.timerWorker) { this.timerWorker.postMessage('start'); } else { this.interval = setInterval(() => this.tick(), 1000); }
+                            if (window.timerWorker) { window.timerWorker.postMessage('start'); } else { this.interval = setInterval(() => this.tick(), 1000); }
                         } else if (s.endTime) {
                             this.expectedEndTime = s.endTime;
                             let remaining = Math.floor((s.endTime - Date.now()) / 1000);
@@ -1437,7 +1437,7 @@
                                 if (this.phase === 'focus') this.displayTime = remaining;
                                 else this.breakTimeLeft = remaining;
                                 this.running = true;
-                                if (this.timerWorker) { this.timerWorker.postMessage('start'); } else { this.interval = setInterval(() => this.tick(), 1000); }
+                                if (window.timerWorker) { window.timerWorker.postMessage('start'); } else { this.interval = setInterval(() => this.tick(), 1000); }
                             } else {
                                 if (this.phase === 'focus') {
                                     this.displayTime = 0;
@@ -1817,12 +1817,12 @@
 
                 this.running = true;
                 this.saveTimerState();
-                if (this.timerWorker) { this.timerWorker.postMessage('start'); } else { this.interval = setInterval(() => this.tick(), 1000); }
+                if (window.timerWorker) { window.timerWorker.postMessage('start'); } else { this.interval = setInterval(() => this.tick(), 1000); }
                 this.syncPopupState();
             },
 
             pause() { 
-                if (this.timerWorker) { this.timerWorker.postMessage('stop'); }
+                if (window.timerWorker) { window.timerWorker.postMessage('stop'); }
                 if (this.interval) { clearInterval(this.interval); this.interval = null; }
                 this.running = false; 
                 this.clearTimerState();
@@ -1922,7 +1922,7 @@
                 
                 this.running = true; 
                 this.saveTimerState();
-                this.interval = setInterval(() => this.tick(), 1000);
+                if (window.timerWorker) { window.timerWorker.postMessage('start'); } else { this.interval = setInterval(() => this.tick(), 1000); }
             },
 
             tickBreak() {
@@ -1980,7 +1980,7 @@
             },
 
             notify(title, body) {
-                if (!this.notificationsEnabled || !('Notification' in window) || Notification.permission !== 'granted') return;
+                // If notifications are totally blocked, OS notification won't show, but Swal and sound will.
                 this.showNotification(title, body);
             },
 
