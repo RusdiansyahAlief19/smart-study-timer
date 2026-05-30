@@ -1759,6 +1759,17 @@
             start() {
                 if (this.running) return;
                 
+                // Fix Autoplay Policy: Inisiasi AudioContext saat user klik tombol Start
+                try {
+                    if (!window.globalAudioCtx) {
+                        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                        if (AudioCtx) window.globalAudioCtx = new AudioCtx();
+                    }
+                    if (window.globalAudioCtx && window.globalAudioCtx.state === 'suspended') {
+                        window.globalAudioCtx.resume();
+                    }
+                } catch(e) {}
+                
                 if (this.phase === 'idle') {
                     this.phase = 'focus';
                     if (this.method !== 'flowtime') { 
@@ -2145,9 +2156,15 @@
 
             playAlertSound() {
                 try {
-                    const AudioCtx = window.AudioContext || window.webkitAudioContext;
-                    if (!AudioCtx) return;
-                    const ctx = new AudioCtx();
+                    if (!window.globalAudioCtx) {
+                        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                        if (!AudioCtx) return;
+                        window.globalAudioCtx = new AudioCtx();
+                    }
+                    const ctx = window.globalAudioCtx;
+                    if (ctx.state === 'suspended') {
+                        ctx.resume();
+                    }
                     const osc = ctx.createOscillator();
                     const gain = ctx.createGain();
                     osc.type = 'sine';
