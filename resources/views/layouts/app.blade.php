@@ -7,12 +7,16 @@
 
         <title>{{ config('app.name', 'Laravel') }}</title>
 
+        <!-- PWA Manifest -->
+        <link rel="manifest" href="/manifest.json">
+
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
         <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         document.addEventListener('alpine:init', () => {
             Alpine.store('darkMode', {
@@ -697,6 +701,15 @@
             });
         });
     });
+    </script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js').catch((error) => {
+                    console.error('ServiceWorker registration failed: ', error);
+                });
+            });
+        }
     </script>
     </body>
 </html>

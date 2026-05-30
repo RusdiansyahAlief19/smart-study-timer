@@ -1575,45 +1575,57 @@
             },
 
             showNotification(title, body, icon = null, sound = 'complete') {
-                if ('Notification' in window && Notification.permission === 'granted') {
-                    // Play sound effect
-                    this.playNotificationSound(sound);
-                    
-                    // Create PWA-enhanced notification
-                    const notification = new Notification(title, {
-                        body: body,
-                        icon: icon || '/favicon.ico',
-                        badge: '/favicon.ico',
-                        tag: 'timer-notification',
-                        requireInteraction: true,
-                        silent: false,
-                        vibrate: [200, 100, 200],
-                        data: {
-                            url: window.location.href,
-                            timestamp: Date.now()
+                // Play sound effect
+                this.playNotificationSound(sound);
+                
+                // Show SweetAlert2 Modal as in-app visual alert
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        title: title,
+                        text: body,
+                        icon: 'success',
+                        confirmButtonText: 'Tutup',
+                        confirmButtonColor: '#4a9eff',
+                        background: document.documentElement.getAttribute('data-theme') === 'light' ? '#ffffff' : '#1e293b',
+                        color: document.documentElement.getAttribute('data-theme') === 'light' ? '#1e293b' : '#e4e8f5',
+                        customClass: {
+                            popup: 'rounded-2xl shadow-2xl'
                         }
                     });
-                    
-                    // Handle notification clicks
-                    notification.onclick = () => {
-                        window.focus();
-                        notification.close();
-                    };
-                    
-                    // Handle notification actions
-                    notification.onclose = () => {
-                        console.log('Notification closed');
-                    };
-                    
-                    // Auto-close after 15 seconds
-                    setTimeout(() => {
-                        if (notification.close) {
+                }
+
+                // Show OS native notification
+                if ('Notification' in window && Notification.permission === 'granted') {
+                    if ('serviceWorker' in navigator) {
+                        navigator.serviceWorker.ready.then(registration => {
+                            registration.showNotification(title, {
+                                body: body,
+                                icon: icon || '/favicon.ico',
+                                badge: '/favicon.ico',
+                                tag: 'timer-notification',
+                                requireInteraction: true,
+                                vibrate: [200, 100, 200],
+                                data: {
+                                    url: window.location.href,
+                                    timestamp: Date.now()
+                                }
+                            });
+                        });
+                    } else {
+                        const notification = new Notification(title, {
+                            body: body,
+                            icon: icon || '/favicon.ico',
+                            badge: '/favicon.ico',
+                            tag: 'timer-notification',
+                            requireInteraction: true,
+                            vibrate: [200, 100, 200]
+                        });
+                        notification.onclick = function(event) {
+                            event.preventDefault();
+                            window.focus();
                             notification.close();
-                        }
-                    }, 15000);
-                    
-                    // Show toast for visual feedback
-                    this.toast('🔔 ' + title);
+                        };
+                    }
                 }
             },
             
