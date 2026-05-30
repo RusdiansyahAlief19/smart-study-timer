@@ -2187,17 +2187,29 @@
                     if (ctx.state === 'suspended') {
                         ctx.resume();
                     }
-                    const osc = ctx.createOscillator();
-                    const gain = ctx.createGain();
-                    osc.type = 'sine';
-                    osc.frequency.setValueAtTime(880, ctx.currentTime);
-                    gain.gain.setValueAtTime(0.001, ctx.currentTime);
-                    gain.gain.exponentialRampToValueAtTime(0.07, ctx.currentTime + 0.02);
-                    gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.35);
-                    osc.connect(gain);
-                    gain.connect(ctx.destination);
-                    osc.start();
-                    osc.stop(ctx.currentTime + 0.36);
+                    
+                    // Mainkan suara ALARM yang keras dan panjang (BEEP BEEP BEEP berulang)
+                    for (let i = 0; i < 12; i++) {
+                        const osc = ctx.createOscillator();
+                        const gain = ctx.createGain();
+                        
+                        // Gelombang square lebih keras dan berisik
+                        osc.type = 'square'; 
+                        
+                        // Buat nadanya naik-turun sedikit biar seperti alarm betulan
+                        osc.frequency.setValueAtTime(i % 2 === 0 ? 800 : 1200, ctx.currentTime + (i * 0.25));
+                        
+                        // Volume envelope: cepat naik, perlahan turun
+                        gain.gain.setValueAtTime(0, ctx.currentTime + (i * 0.25));
+                        gain.gain.linearRampToValueAtTime(0.2, ctx.currentTime + (i * 0.25) + 0.05);
+                        gain.gain.linearRampToValueAtTime(0, ctx.currentTime + (i * 0.25) + 0.2);
+                        
+                        osc.connect(gain);
+                        gain.connect(ctx.destination);
+                        
+                        osc.start(ctx.currentTime + (i * 0.25));
+                        osc.stop(ctx.currentTime + (i * 0.25) + 0.2);
+                    }
                 } catch (_) {}
             },
 
